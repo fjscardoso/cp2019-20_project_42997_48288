@@ -18,8 +18,8 @@ cd parallel_patterns_seq
 make
 ```
 * How to run tests
-   * Example: `./main 1000000`
-   * Example with debug: `./main -d 10`
+    * Example: `./main 1000000`
+    * Example with debug: `./main -d 10`
 
 ### Who do I talk to? ###
 
