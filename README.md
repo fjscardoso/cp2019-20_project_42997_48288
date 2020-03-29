@@ -12,7 +12,7 @@ This README would normally document whatever steps are necessary to get your app
 
 * Summary of set up
 
-```bash
+```
 git clone https://joaomlourenco@bitbucket.org/joaomlourenco/parallel_patterns_seq.git
 cd parallel_patterns_seq
 make
