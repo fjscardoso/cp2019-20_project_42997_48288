@@ -11,12 +11,14 @@ This README would normally document whatever steps are necessary to get your app
 ### How do I get set up? ###
 
 * Summary of set up
+
 ```bash
 git clone https://joaomlourenco@bitbucket.org/joaomlourenco/parallel_patterns_seq.git
 cd parallel_patterns_seq
 make
 ```
 * How to run tests
+
 Example: `./main 1000000`
 Example with debug: `./main -d 10`
 
