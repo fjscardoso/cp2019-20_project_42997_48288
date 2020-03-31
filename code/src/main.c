@@ -11,11 +11,13 @@
 #define TYPE double
 
 
-// You may replace this with opm_get_wtime()
-static long wall_clock_time(void) {
+////////////////////////////////////////////////////////////////////////////////////////
+/// Get wall clock time as a double
+/// You may replace this with opm_get_wtime()
+double wctime () {
     struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return (long)tv.tv_sec * 1e6 + tv.tv_usec;
+    gettimeofday (&tv, NULL);
+    return tv.tv_sec + 1E-6 * tv.tv_usec;
 }
 
 
@@ -41,7 +43,7 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    srand(time(NULL));
+    srand48(time(NULL));
     srand48(time(NULL));
 
     N = atol(argv[0]);
@@ -58,10 +60,10 @@ int main(int argc, char* argv[]) {
         printf ("\n\n");
 
     for (int i = 0;  i < nTestFunction;  i++) {
-        long start = wall_clock_time();
+        double start = wctime();
         testFunction[i] (src, N, sizeof(*src));
-        long end = wall_clock_time();
-        printf ("%s:\t%8ld\tmicroseconds\n", testNames[i], end-start);
+        double end = wctime();
+        printf ("%s:\t%6.3lf seconds\n", testNames[i], end-start);
         if (debug)
             printf ("\n\n");
     }
