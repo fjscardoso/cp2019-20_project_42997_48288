@@ -68,5 +68,6 @@ int main(int argc, char* argv[]) {
             printf ("\n\n");
     }
 
+    free (src);
     return 0;
 }
