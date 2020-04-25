@@ -1,11 +1,15 @@
 #include <string.h>
 #include <assert.h>
 #include "patterns.h"
+#include <omp.h>
+#include <stdio.h>
 
-//First pattern to implement
-void map(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2))
+//======================================================================================================================
+// MAP
+//======================================================================================================================
+//SEQUENTIAL
+void mapSequential(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2))
 {
-
     /* To be implemented */
     assert(dest != NULL);
     assert(src != NULL);
@@ -18,6 +22,28 @@ void map(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void
     }
 }
 
+//PARALLEL
+void map(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2))
+{
+    /* To be implemented */
+    //int nthreads, tid;
+    assert(dest != NULL);
+    assert(src != NULL);
+    assert(worker != NULL);
+    char *d = dest;
+    char *s = src;
+#pragma omp parallel for num_threads (8)
+    for (int i = 0; i < nJob; i++)
+    {
+        //tid = omp_get_thread_num();
+        //printf("%d\n", tid);
+        worker(&d[i * sizeJob], &s[i * sizeJob]);
+    }
+}
+
+//======================================================================================================================
+// REDUCE
+//======================================================================================================================
 void reduce(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2, const void *v3))
 {
     /* To be implemented */
@@ -34,6 +60,9 @@ void reduce(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(v
     }
 }
 
+//======================================================================================================================
+// SCAN
+//======================================================================================================================
 void scan(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2, const void *v3))
 {
     /* To be implemented */
@@ -50,6 +79,9 @@ void scan(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(voi
     }
 }
 
+//======================================================================================================================
+// PACK
+//======================================================================================================================
 int pack(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
 {
     /* To be implemented */
@@ -72,6 +104,9 @@ int pack(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
     return pos;
 }
 
+//======================================================================================================================
+// GATHER
+//======================================================================================================================
 void gather(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter, int nFilter)
 {
     /* To be implemented */
@@ -90,6 +125,9 @@ void gather(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filte
     }
 }
 
+//======================================================================================================================
+// SCATTER
+//======================================================================================================================
 void scatter(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
 {
     /* To be implemented */
@@ -107,6 +145,9 @@ void scatter(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filt
     }
 }
 
+//======================================================================================================================
+// PIPELINE
+//======================================================================================================================
 void pipeline(void *dest, void *src, size_t nJob, size_t sizeJob, void (*workerList[])(void *v1, const void *v2), size_t nWorkers)
 {
     /* To be implemented */
@@ -128,6 +169,9 @@ void pipeline(void *dest, void *src, size_t nJob, size_t sizeJob, void (*workerL
     }
 }
 
+//======================================================================================================================
+// FARM
+//======================================================================================================================
 void farm(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2), size_t nWorkers)
 {
     /* To be implemented */

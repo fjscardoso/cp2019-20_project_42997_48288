@@ -400,4 +400,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+#Clion files
+.idea/
+
 # End of https://www.gitignore.io/api/c++,java,linux,macos,latex,windows
