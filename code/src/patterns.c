@@ -44,7 +44,7 @@ void map(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void
 //======================================================================================================================
 // REDUCE
 //======================================================================================================================
-void reduce(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2, const void *v3))
+void reduceSequential(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2, const void *v3))
 {
     /* To be implemented */
     assert(dest != NULL);
@@ -58,6 +58,42 @@ void reduce(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(v
         for (int i = 1; i < nJob; i++)
             worker(&d[0], &d[0], &s[i * sizeJob]);
     }
+}
+
+void reduce(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2, const void *v3))
+{
+    /* To be implemented */
+    assert(dest != NULL);
+    assert(src != NULL);
+    assert(worker != NULL);
+    char *d = dest;
+
+    size_t a = 1;
+    void *aux = malloc(nJob * sizeJob);
+
+    char *aa = aux;
+
+    while (a <= nJob){
+            //#pragma omp parallel for num_threads(4)
+             for(int i = 0; i<nJob-a; i = (i + a*2)) {
+                if (a == 1) {
+                    worker (aux + i * sizeJob, src + i * sizeJob, src + (i+a) * sizeJob);
+                } else {
+                    worker (aux + i * sizeJob, aux + i * sizeJob, aux + (i+a) * sizeJob);
+                }
+            }
+            a = a * 2;
+        }
+
+        for(int i = 0; i<nJob-4; i = (i + 4)) {
+            worker (aux + 0 * sizeJob, aux + i * sizeJob, aux + (i+4) * sizeJob);
+        }
+
+
+        memcpy(&d[0], &aa[nJob * sizeJob - 4*sizeJob], sizeJob);
+
+
+        free(aux);
 }
 
 //======================================================================================================================

@@ -90,6 +90,14 @@ void testReduce(void *src, size_t n, size_t size)
     free(dest);
 }
 
+void testReduceSequential(void *src, size_t n, size_t size)
+{
+    TYPE *dest = malloc(size);
+    reduceSequential(dest, src, n, size, workerAdd);
+    printDouble(dest, 1, __FUNCTION__);
+    free(dest);
+}
+
 void testScan(void *src, size_t n, size_t size)
 {
     TYPE *dest = malloc(n * size);
@@ -114,7 +122,7 @@ void testPack(void *src, size_t n, size_t size)
 
 void testGather(void *src, size_t n, size_t size)
 {
-    int nFilter = n/10000;
+    int nFilter = n/1000000;
     TYPE *dest = malloc(nFilter * size);
     int filter[nFilter];
     for (int i = 0; i < nFilter; i++)
@@ -127,13 +135,13 @@ void testGather(void *src, size_t n, size_t size)
 
 void testGatherSequential(void *src, size_t n, size_t size)
 {
-    int nFilter = n/10000;
+    int nFilter = n/1000000;
     TYPE *dest = malloc(nFilter * size);
     int filter[nFilter];
     for (int i = 0; i < nFilter; i++)
         filter[i] = rand() % n;
     printInt(filter, nFilter, "filter");
-    gather(dest, src, n, size, filter, nFilter);
+    gatherSequential(dest, src, n, size, filter, nFilter);
     printDouble(dest, nFilter, __FUNCTION__);
     free(dest);
 }
@@ -196,8 +204,9 @@ TESTFUNCTION testFunction[] = {
     //testMap,
     //testMapSequential,
     testGather,
-    testGatherSequential
-    // testReduce,
+    testGatherSequential,
+     //testReduce,
+     //testReduceSequential,
     // testScan,
     // testPack,
     // testGather,
@@ -209,9 +218,10 @@ TESTFUNCTION testFunction[] = {
 char *testNames[] = {
     //"testMap",
     //"testMapSequential",
-    // "testReduce",
-    // "testScan",
-    // "testPack",
+    //"testReduce",
+    //"testReduceSequential",
+    //"testScan",
+    //"testPack",
     "testGather",
     "testGatherSequential",
     // "testScatter",
