@@ -173,6 +173,13 @@ void testMapSequential(void *src, size_t n, size_t size)
     free(dest);
 }
 
+void testReduceSequential(void *src, size_t n, size_t size)
+{
+    TYPE *dest = malloc(size);
+    reduceSequential(dest, src, n, size, workerAdd);
+    printDouble(dest, 1, __FUNCTION__);
+    free(dest);
+}
 
 //=======================================================
 // List of unit test functions
@@ -181,9 +188,10 @@ void testMapSequential(void *src, size_t n, size_t size)
 typedef void (*TESTFUNCTION)(void *, size_t, size_t);
 
 TESTFUNCTION testFunction[] = {
-    testMap,
-    testMapSequential,
-    // testReduce,
+    // testMap,
+    // testMapSequential,
+    testReduce,
+    testReduceSequential,
     // testScan,
     // testPack,
     // testGather,
@@ -193,9 +201,10 @@ TESTFUNCTION testFunction[] = {
 };
 
 char *testNames[] = {
-    "testMap",
-    "testMapSequential",
-    // "testReduce",
+    // "testMap",
+    // "testMapSequential",
+    "testReduce",
+    "testReduceSequential",
     // "testScan",
     // "testPack",
     // "testGather",

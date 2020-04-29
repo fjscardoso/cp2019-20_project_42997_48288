@@ -7,6 +7,7 @@
 
 #include "unit.h"
 #include "debug.h"
+#include <omp.h>
 
 #define TYPE double
 
@@ -14,6 +15,7 @@
 /// Get wall clock time as a double
 /// You may replace this with opm_get_wtime()
 double wctime()
+//double omp_get_wtime()
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
@@ -60,16 +62,19 @@ int main(int argc, char *argv[])
         src[i] = drand48();
     printf("Done!\n");
 
-    printDouble(src, N, "SRC");
+    //printDouble(src, N, "SRC");
+
     if (debug)
         printf("\n\n");
 
     //For to iterate all test functions and print time wasted on computation
     for (int i = 0; i < nTestFunction; i++)
     {
-        double start = wctime();
+        //double start = wctime();
+        double start = omp_get_wtime();
         testFunction[i](src, N, sizeof(*src));
-        double end = wctime();
+        double end = omp_get_wtime();
+        //double end = wctime();
         printf("%s:\t%6.3lf seconds\n", testNames[i], end - start);
         if (debug)
             printf("\n\n");

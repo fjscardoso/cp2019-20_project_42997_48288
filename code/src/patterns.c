@@ -2,7 +2,10 @@
 #include <assert.h>
 #include "patterns.h"
 #include <omp.h>
+
 #include <stdio.h>
+
+#define TYPE double
 
 //======================================================================================================================
 // MAP
@@ -32,7 +35,7 @@ void map(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void
     assert(worker != NULL);
     char *d = dest;
     char *s = src;
-#pragma omp parallel for num_threads (8)
+#pragma omp parallel for num_threads(8)
     for (int i = 0; i < nJob; i++)
     {
         //tid = omp_get_thread_num();
@@ -44,9 +47,9 @@ void map(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void
 //======================================================================================================================
 // REDUCE
 //======================================================================================================================
-void reduce(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2, const void *v3))
+void reduceSequential(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2, const void *v3))
 {
-    /* To be implemented */
+
     assert(dest != NULL);
     assert(src != NULL);
     assert(worker != NULL);
@@ -57,6 +60,48 @@ void reduce(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(v
         memcpy(&d[0], &s[0], sizeJob);
         for (int i = 1; i < nJob; i++)
             worker(&d[0], &d[0], &s[i * sizeJob]);
+    }
+}
+
+void reduce(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2, const void *v3))
+{
+    assert(dest != NULL);
+    assert(src != NULL);
+    assert(worker != NULL);
+
+    int maxWorkers = omp_get_max_threads();
+    int jobsPerWorker = nJob / maxWorkers;
+    int jobsRemainder = nJob % maxWorkers;
+
+    void *auxArray = malloc(sizeJob * nJob);
+
+    if (nJob > 1)
+    {
+
+#pragma omp parallel for
+        for (int k = 0; k < maxWorkers; k++)
+        {
+            int startJob = k * jobsPerWorker;
+            int endJob = startJob + jobsPerWorker;
+            endJob = k == maxWorkers - 1 ? (endJob + jobsRemainder) : endJob;
+
+            for (int j = startJob; j < endJob; j++)
+            {
+                void *a = auxArray + startJob * sizeJob;
+                void *b = src + j * sizeJob;
+                worker(a, a, b);
+            }
+        }
+
+        for (int i = 1; i < maxWorkers; i++)
+        {
+            void *a = auxArray;
+            void *b = auxArray + i * sizeJob * jobsPerWorker;
+            worker(a, a, b);
+        }
+
+        memcpy(dest, auxArray, sizeJob);
+        free(auxArray);
     }
 }
 
