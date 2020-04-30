@@ -114,7 +114,7 @@ void testPack(void *src, size_t n, size_t size)
 
 void testGather(void *src, size_t n, size_t size)
 {
-    int nFilter = n/10000;
+    int nFilter = n / 10000;
     TYPE *dest = malloc(nFilter * size);
     int filter[nFilter];
     for (int i = 0; i < nFilter; i++)
@@ -127,7 +127,7 @@ void testGather(void *src, size_t n, size_t size)
 
 void testGatherSequential(void *src, size_t n, size_t size)
 {
-    int nFilter = n/10000;
+    int nFilter = n / 10000;
     TYPE *dest = malloc(nFilter * size);
     int filter[nFilter];
     for (int i = 0; i < nFilter; i++)
@@ -201,38 +201,38 @@ void testReduceSequential(void *src, size_t n, size_t size)
 typedef void (*TESTFUNCTION)(void *, size_t, size_t);
 
 TESTFUNCTION testFunction[] = {
-    //testMap,
-    //testMapSequential,
+    testMap,
+    testMapSequential,
     testGather,
-    testGatherSequential
-    // testReduce,
-    // testMap,
-    // testMapSequential,
+    testGatherSequential,
+    testReduce,
+    testMap,
+    testMapSequential,
     testReduce,
     testReduceSequential,
-    // testScan,
-    // testPack,
-    // testGather,
-    // testScatter,
-    // testPipeline,
-    // testFarm,
+    testScan,
+    testPack,
+    testGather,
+    testScatter,
+    testPipeline,
+    testFarm,
 };
 
 char *testNames[] = {
-    // "testMap",
-    // "testMapSequential",
+    "testMap",
+    "testMapSequential",
     "testReduce",
     "testReduceSequential",
-    //"testMap",
-    //"testMapSequential",
-    // "testReduce",
-    // "testScan",
-    // "testPack",
+    "testMap",
+    "testMapSequential",
+    "testReduce",
+    "testScan",
+    "testPack",
     "testGather",
     "testGatherSequential",
-    // "testScatter",
-    // "testPipeline",
-    // "testFarm",
+    "testScatter",
+    "testPipeline",
+    "testFarm",
 };
 
 int nTestFunction = sizeof(testFunction) / sizeof(testFunction[0]);
