@@ -181,7 +181,7 @@ void gather(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filte
     assert(nFilter >= 0);
     char *d = dest;
     char *s = src;
-    #pragma omp parallel for num_threads(4)
+#pragma omp parallel for num_threads(4)
     for (int i = 0; i < nFilter; i++)
     {
         assert(filter[i] < nJob);
@@ -192,7 +192,7 @@ void gather(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filte
 //======================================================================================================================
 // SCATTER
 //======================================================================================================================
-void scatter(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
+void scatterSequential(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
 {
     /* To be implemented */
     assert(dest != NULL);
@@ -206,6 +206,33 @@ void scatter(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filt
     {
         assert(filter[i] < nJob);
         memcpy(&d[filter[i] * sizeJob], &s[i * sizeJob], sizeJob);
+    }
+}
+
+void scatter(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
+{
+    /* To be implemented */
+    assert(dest != NULL);
+    assert(src != NULL);
+    assert(filter != NULL);
+    assert(nJob >= 0);
+    assert(sizeJob > 0);
+    char *d = dest;
+    char *s = src;
+
+    int *auxFilter = malloc(sizeof(int) * nJob);
+    memset(auxFilter, -1, sizeof(int) * nJob);
+
+#pragma omp parallel for
+    for (int i = 0; i < nJob; i++)
+    {
+        assert(filter[i] < nJob);
+        //printf("auxFilter[%d]:%d, auxFilter[filter[%d]]:%d\n", i, auxFilter[i], i, auxFilter[filter[i]]);
+        if (auxFilter[i] == -1 || i > auxFilter[filter[i]])
+        {
+            memcpy(&d[filter[i] * sizeJob], &s[i * sizeJob], sizeJob);
+            auxFilter[filter[i]] = i;
+        }
     }
 }
 

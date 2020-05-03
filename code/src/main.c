@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
         src[i] = drand48();
     printf("Done!\n");
 
-    //printDouble(src, N, "SRC");
+    printDouble(src, N, "SRC");
 
     if (debug)
         printf("\n\n");
@@ -75,7 +75,8 @@ int main(int argc, char *argv[])
         testFunction[i](src, N, sizeof(*src));
         double end = omp_get_wtime();
         //double end = wctime();
-        printf("%s:\t%6.3lf seconds\n", testNames[i], end - start);
+        //printf("%s:\t%6.3lf seconds\n", testNames[i], end - start);
+        printf("%d,%s,%6.3lf\n", N, testNames[i], end - start);
         if (debug)
             printf("\n\n");
     }

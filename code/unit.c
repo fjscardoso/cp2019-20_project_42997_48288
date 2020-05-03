@@ -196,7 +196,7 @@ void testReduceSequential(void *src, size_t n, size_t size)
 
 void testScatterSequential(void *src, size_t n, size_t size)
 {
-    int nDest = 30000;
+    int nDest = 6;
     TYPE *dest = malloc(nDest * size);
     memset(dest, 0, nDest * size);
     int *filter = calloc(n, sizeof(*filter));
@@ -216,31 +216,31 @@ void testScatterSequential(void *src, size_t n, size_t size)
 typedef void (*TESTFUNCTION)(void *, size_t, size_t);
 
 TESTFUNCTION testFunction[] = {
-    // testMap,
-    // testMapSequential,
-    // testGather,
-    // testGatherSequential,
-    // testReduce,
-    // testReduceSequential,
+    testMap,
+    testMapSequential,
+    testGather,
+    testGatherSequential,
+    testReduce,
+    testReduceSequential,
     // testScan,
     // testPack,
-    testScatter,
-    testScatterSequential,
+    //testScatter,
+    //testScatterSequential,
     // testPipeline,
     // testFarm,
 };
 
 char *testNames[] = {
-    // "testMap",
-    // "testMapSequential",
-    // "testGather",
-    // "testGatherSequential",
-    // "testReduce",
-    // "testReduceSequential",
+    "testMap",
+    "testMapSequential",
+    "testGather",
+    "testGatherSequential",
+    "testReduce",
+    "testReduceSequential",
     // "testScan",
     // "testPack",
-    "testScatter",
-    "testScatterSequential",
+    //"testScatter_par",
+    //"testScatter_seq",
     // "testPipeline",
     // "testFarm",
 };
