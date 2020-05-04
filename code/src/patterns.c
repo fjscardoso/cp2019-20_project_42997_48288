@@ -194,7 +194,6 @@ void gather(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filte
 //======================================================================================================================
 void scatterSequential(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
 {
-    /* To be implemented */
     assert(dest != NULL);
     assert(src != NULL);
     assert(filter != NULL);
@@ -202,15 +201,12 @@ void scatterSequential(void *dest, void *src, size_t nJob, size_t sizeJob, const
     assert(sizeJob > 0);
     char *d = dest;
     char *s = src;
-    //double start1 = omp_get_wtime();
 
     for (int i = 0; i < nJob; i++)
     {
         assert(filter[i] < nJob);
         memcpy(&d[filter[i] * sizeJob], &s[i * sizeJob], sizeJob);
     }
-    //double end1 = omp_get_wtime();
-    //printf("Start1:%6.3lf\n", end1 - start1);
 }
 
 void scatter(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
@@ -222,18 +218,12 @@ void scatter(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filt
     assert(sizeJob > 0);
     char *d = dest;
     char *s = src;
-
-    // int *auxFilter = malloc(nJob * sizeof(int));
-    // memset(auxFilter, -1, sizeof(int) * nJob);
     int *auxFilter = calloc(nJob, sizeof(int));
 
 #pragma omp parallel for num_threads(8)
     for (int i = 0; i < nJob; i++)
     {
-        // int tid = omp_get_thread_num();
-        // printf("ThreadID:%d\n", tid);
         assert(filter[i] < nJob);
-        //printf("auxFilter[%d]:%d, auxFilter[filter[%d]]:%d\n", i, auxFilter[i], i, auxFilter[filter[i]]);
         if (i > auxFilter[filter[i]])
         {
             memcpy(&d[filter[i] * sizeJob], &s[i * sizeJob], sizeJob);
