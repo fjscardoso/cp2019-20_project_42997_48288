@@ -178,6 +178,15 @@ void testFarm(void *src, size_t n, size_t size)
 // List of unit test sequential
 //=======================================================
 
+
+void testScanSequential(void *src, size_t n, size_t size)
+{
+    TYPE *dest = malloc(n * size);
+    scanSequential(dest, src, n, size, workerAdd);
+    printDouble(dest, n, __FUNCTION__);
+    free(dest);
+}
+
 void testMapSequential(void *src, size_t n, size_t size)
 {
     TYPE *dest = malloc(n * size);
@@ -222,7 +231,8 @@ TESTFUNCTION testFunction[] = {
     testGatherSequential,
     testReduce,
     testReduceSequential,
-    // testScan,
+    testScan,
+    testScanSequential,
     // testPack,
     //testScatter,
     testScatter,
@@ -238,7 +248,8 @@ char *testNames[] = {
     "testGatherSequential",
     "testReduce",
     "testReduceSequential",
-    // "testScan",
+    "testScan",
+    "testScanSequential",
     // "testPack",
     "testScatter",
     "testScatterSequential",
