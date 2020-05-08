@@ -4,6 +4,8 @@
 #include <omp.h>
 #include <stdio.h>
 
+#define TYPE double
+
 //======================================================================================================================
 // MAP
 //======================================================================================================================
@@ -109,7 +111,13 @@ int packSequential(void *dest, void *src, size_t nJob, size_t sizeJob, const int
     return pos;
 }
 
-int pack(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter, void (*worker)(void *v1, const void *v2, const void *v3))
+static void workerAddPack(void *a, const void *b, const void *c)
+{
+    // a = b + c
+    *(TYPE *)a = *(TYPE *)b + *(TYPE *)c;
+}
+
+int pack(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
 {
     /* To be implemented */
     assert(dest != NULL);
@@ -123,7 +131,7 @@ int pack(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter, 
 
     void *bitsum = malloc((nJob+1) * sizeof(int));
 
-    scan(bitsum, (void*)filter, nJob, sizeof(int), worker);
+    scan(bitsum, (void*)filter, nJob, sizeof(int), workerAddPack);
 
     //char *ptr = aux;
 
@@ -140,6 +148,7 @@ int pack(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter, 
     #pragma omp parallel for
     for (int i = 0; i < nJob; i++)
     {
+
         if (filter[i])
         {
             int x = ((int*)bitsum)[i];
