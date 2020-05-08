@@ -209,6 +209,19 @@ void testScatterSequential(void *src, size_t n, size_t size)
     free(dest);
 }
 
+void testPipelineSequential(void *src, size_t n, size_t size)
+{
+    void (*pipelineFunction[])(void *, const void *) = {
+        workerMultTwo,
+        workerAddOne,
+        workerDivTwo};
+    int nPipelineFunction = sizeof(pipelineFunction) / sizeof(pipelineFunction[0]);
+    TYPE *dest = malloc(n * size);
+    pipelineSequential(dest, src, n, size, pipelineFunction, nPipelineFunction);
+    printDouble(dest, n, __FUNCTION__);
+    free(dest);
+}
+
 //=======================================================
 // List of unit test functions
 //=======================================================
@@ -216,33 +229,35 @@ void testScatterSequential(void *src, size_t n, size_t size)
 typedef void (*TESTFUNCTION)(void *, size_t, size_t);
 
 TESTFUNCTION testFunction[] = {
-    testMap,
-    testMapSequential,
-    testGather,
-    testGatherSequential,
-    testReduce,
-    testReduceSequential,
+    // testMap,
+    // testMapSequential,
+    // testGather,
+    // testGatherSequential,
+    // testReduce,
+    // testReduceSequential,
     // testScan,
     // testPack,
     //testScatter,
-    testScatter,
-    testScatterSequential,
-    // testPipeline,
+    // testScatter,
+    // testScatterSequential,
+    testPipeline,
+    testPipelineSequential,
     // testFarm,
 };
 
 char *testNames[] = {
-    "testMap",
-    "testMapSequential",
-    "testGather",
-    "testGatherSequential",
-    "testReduce",
-    "testReduceSequential",
+    // "testMap",
+    // "testMapSequential",
+    // "testGather",
+    // "testGatherSequential",
+    // "testReduce",
+    // "testReduceSequential",
     // "testScan",
     // "testPack",
-    "testScatter",
-    "testScatterSequential",
-    // "testPipeline",
+    // "testScatter",
+    // "testScatterSequential",
+    "testPipeline",
+    "testPipelineSequential",
     // "testFarm",
 };
 

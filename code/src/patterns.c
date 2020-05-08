@@ -237,9 +237,8 @@ void scatter(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filt
 //======================================================================================================================
 // PIPELINE
 //======================================================================================================================
-void pipeline(void *dest, void *src, size_t nJob, size_t sizeJob, void (*workerList[])(void *v1, const void *v2), size_t nWorkers)
+void pipelineSequential(void *dest, void *src, size_t nJob, size_t sizeJob, void (*workerList[])(void *v1, const void *v2), size_t nWorkers)
 {
-    /* To be implemented */
     assert(dest != NULL);
     assert(src != NULL);
     assert(workerList != NULL);
@@ -254,6 +253,48 @@ void pipeline(void *dest, void *src, size_t nJob, size_t sizeJob, void (*workerL
         {
             assert(workerList[j] != NULL);
             workerList[j](&d[i * sizeJob], &d[i * sizeJob]);
+        }
+    }
+}
+
+// Implementation used from: Solihin, Yan. (2015). "Fundamentals of Parallel Computer Architecture". Pág 40
+//Calculate number of anti-diagonals
+//foreach anti-diagonal do {
+//calculate number of points of anti-diagonal
+//foreach point in current ant-diagonal do {
+//compute current point in matrix
+//}
+void pipeline(void *dest, void *src, size_t nJob, size_t sizeJob, void (*workerList[])(void *v1, const void *v2), size_t nWorkers)
+{
+    assert(dest != NULL);
+    assert(src != NULL);
+    assert(workerList != NULL);
+    assert(nJob >= 0);
+    assert(sizeJob > 0);
+    char *d = dest;
+    char *s = src;
+
+#pragma omp parallel for
+    for (int i = 0; i < nJob; i++)
+    {
+        memcpy(&d[i * sizeJob], &s[i * sizeJob], sizeJob);
+    }
+    int k = 0;
+    int row = k;
+    int j = 0;
+    int diagonals = (nJob + nWorkers) - 1;
+    //int tid;
+    for (k = 0; k < diagonals; k++)
+    {
+        row = k;
+#pragma omp for schedule(dynamic)
+        for (j = 0; j < nWorkers; j++)
+        {
+            if (row >= 0 && row < nJob)
+            {
+                workerList[j](&d[row * sizeJob], &d[row * sizeJob]);
+            }
+            row--;
         }
     }
 }

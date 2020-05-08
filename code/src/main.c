@@ -53,15 +53,15 @@ int main(int argc, char *argv[])
     N = atol(argv[0]);
 
     //Malloc memory for [] src
-    printf("Initializing SRC array\n");
+    //printf("Initializing SRC array\n");
     TYPE *src = malloc(sizeof(*src) * N);
 
     //For to fill [] src with longs
     for (i = 0; i < N; i++)
         src[i] = drand48();
-    printf("Done!\n");
+    //printf("Done!\n");
 
-    printDouble(src, N, "SRC");
+    //printDouble(src, N, "SRC");
 
     if (debug)
         printf("\n\n");
