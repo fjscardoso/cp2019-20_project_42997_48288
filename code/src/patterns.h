@@ -39,6 +39,15 @@ int pack (
   void *src,            // Source array
   size_t nJob,          // # elements in the source array
   size_t sizeJob,       // Size of each element in the source array
+  const int *filter,    // Filer for pack
+  void (*worker)(void *v1, const void *v2, const void *v3) // [ v1 = op (v2, v3) ]
+);
+
+int packSequential (
+  void *dest,           // Target array
+  void *src,            // Source array
+  size_t nJob,          // # elements in the source array
+  size_t sizeJob,       // Size of each element in the source array
   const int *filter     // Filer for pack
 );
 
