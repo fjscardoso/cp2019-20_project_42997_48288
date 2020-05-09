@@ -43,6 +43,20 @@ void mapSequential(
     size_t nJob,                             // # elements in the source array
     size_t sizeJob,                          // Size of each element in the source array
     void (*worker)(void *v1, const void *v2) // [ v1 = op (v2) ]
+int pack (
+  void *dest,           // Target array
+  void *src,            // Source array
+  size_t nJob,          // # elements in the source array
+  size_t sizeJob,       // Size of each element in the source array
+  const int *filter   // Filer for pack
+);
+
+int packSequential (
+  void *dest,           // Target array
+  void *src,            // Source array
+  size_t nJob,          // # elements in the source array
+  size_t sizeJob,       // Size of each element in the source array
+  const int *filter     // Filer for pack
 );
 
 void reduce(

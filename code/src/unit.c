@@ -195,6 +195,20 @@ void testMapSequential(void *src, size_t n, size_t size)
     free(dest);
 }
 
+void testPackSequential(void *src, size_t n, size_t size)
+{
+    int nFilter = 3;
+    TYPE *dest = malloc(nFilter * size);
+    int *filter = calloc(n, sizeof(*filter));
+    for (int i = 0; i < n; i++)
+        filter[i] = (i == 0 || i == n / 2 || i == n - 1);
+    int newN = packSequential(dest, src, n, size, filter);
+    printInt(filter, n, "filter");
+    printDouble(dest, newN, __FUNCTION__);
+    free(filter);
+    free(dest);
+}
+
 void testReduceSequential(void *src, size_t n, size_t size)
 {
     TYPE *dest = malloc(size);
@@ -245,8 +259,9 @@ TESTFUNCTION testFunction[] = {
     // testReduce,
     // testReduceSequential,
     // testScan,
-    // testPack,
-    //testScatter,
+     testPack,
+     testPackSequential,
+    // testGather,
     // testScatter,
     // testScatterSequential,
     testPipeline,
@@ -262,7 +277,10 @@ char *testNames[] = {
     // "testReduce",
     // "testReduceSequential",
     // "testScan",
-    // "testPack",
+     "testPack",
+     "testPackSequential",
+    //"testGather",
+    //"testGatherSequential",
     // "testScatter",
     // "testScatterSequential",
     "testPipeline",

@@ -116,6 +116,11 @@ void scanSequential(void *dest, void *src, size_t nJob, size_t sizeJob, void (*w
     assert(worker != NULL);
     char *d = dest;
     char *s = src;
+
+    //printf ("%s: ", "scan filter - ");
+    //for (int i = 0;  i < nJob;  i++)
+    //    printf ("%d", ((int*)src)[i]);
+
     if (nJob > 1)
     {
         memcpy(&d[0], &s[0], sizeJob);
@@ -265,7 +270,7 @@ void downPass(void *src, void *dest, size_t isleft, struct node* parent, struct 
 //======================================================================================================================
 // PACK
 //======================================================================================================================
-int pack(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
+int packSequential(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
 {
     /* To be implemented */
     assert(dest != NULL);
@@ -281,6 +286,54 @@ int pack(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
         if (filter[i])
         {
             memcpy(&d[pos * sizeJob], &s[i * sizeJob], sizeJob);
+            pos++;
+        }
+    }
+    return pos;
+}
+
+static void workerAddPack(void *a, const void *b, const void *c)
+{
+    // a = b + c
+    *(TYPE *)a = *(TYPE *)b + *(TYPE *)c;
+}
+
+int pack(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
+{
+    /* To be implemented */
+    assert(dest != NULL);
+    assert(src != NULL);
+    assert(filter != NULL);
+    assert(nJob >= 0);
+    assert(sizeJob > 0);
+    char *d = dest;
+    char *s = src;
+    int pos = 0;
+
+    void *bitsum = malloc((nJob+1) * sizeof(int));
+
+    scan(bitsum, (void*)filter, nJob, sizeof(int), workerAddPack);
+
+    //char *ptr = aux;
+
+
+    //printf ("%s: ", "scan sum - ");
+    //for (int i = 0;  i < nJob;  i++)
+    //  printf ("%d", ((int*)aux)[i]);
+
+    //memcpy(&ptr, aux + pos * sizeof(int), sizeof(int));
+
+    //printf("VALOR PTR  = %s", ptr + pos *sizeof(int));
+
+
+    #pragma omp parallel for
+    for (int i = 0; i < nJob; i++)
+    {
+
+        if (filter[i])
+        {
+            int x = ((int*)bitsum)[i];
+            memcpy(&d[(x-1) * sizeJob], &s[i * sizeJob], sizeJob);
             pos++;
         }
     }
