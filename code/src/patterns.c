@@ -450,8 +450,53 @@ void pipeline(void *dest, void *src, size_t nJob, size_t sizeJob, void (*workerL
 //======================================================================================================================
 // FARM
 //======================================================================================================================
-void farm(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2), size_t nWorkers)
+void farmSequential(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2), size_t nWorkers)
 {
     /* To be implemented */
     map(dest, src, nJob, sizeJob, worker); // it provides the right result, but is a very very vey bad implementation…
+}
+
+void newTask(void *dest, void *src, size_t sizeJob, size_t startJob, size_t endJob, void (*worker)(void *v1, const void *v2))
+{
+    assert(dest != NULL);
+    assert(src != NULL);
+    assert(worker != NULL);
+    char *d = dest;
+    char *s = src;
+
+    for (int i = startJob; i < endJob; i++)
+    {
+        worker(&d[i * sizeJob], &s[i * sizeJob]);
+        //worker(&d[i * sizeJob], &s[i * sizeJob]);
+    }
+}
+
+void farm(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2), size_t nWorkers)
+{
+    assert(dest != NULL);
+    assert(src != NULL);
+    assert(worker != NULL);
+    char *d = dest;
+    char *s = src;
+    int maxWorkers = nWorkers;
+    int jobsPerWorker = nJob / maxWorkers;
+    int jobsRemainder = nJob % maxWorkers;
+
+#pragma omp parallel
+    {
+#pragma omp master
+        {
+
+            for (int k = 0; k < maxWorkers; k++)
+            {
+                //tid = omp_get_thread_num();
+                //printf("TID:%d\n", tid);
+                int startJob = k * jobsPerWorker;
+                int endJob = startJob + jobsPerWorker;
+                endJob = k == maxWorkers - 1 ? (endJob + jobsRemainder) : endJob;
+#pragma omp task
+                newTask(d, s, sizeJob, startJob, endJob, worker);
+            }
+        }
+    }
 }

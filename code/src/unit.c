@@ -161,20 +161,6 @@ void testFarm(void *src, size_t n, size_t size)
     free(dest);
 }
 
-void testPackSequential(void *src, size_t n, size_t size)
-{
-    int nFilter = 3;
-    TYPE *dest = malloc(nFilter * size);
-    int *filter = calloc(n, sizeof(*filter));
-    for (int i = 0; i < n; i++)
-        filter[i] = (i == 0 || i == n / 2 || i == n - 1);
-    int newN = packSequential(dest, src, n, size, filter);
-    printInt(filter, n, "filter");
-    printDouble(dest, newN, __FUNCTION__);
-    free(filter);
-    free(dest);
-}
-
 //=======================================================
 // List of unit test sequential
 //=======================================================
@@ -260,6 +246,14 @@ void testPipelineSequential(void *src, size_t n, size_t size)
     free(dest);
 }
 
+void testFarmSequential(void *src, size_t n, size_t size)
+{
+    TYPE *dest = malloc(n * size);
+    farmSequential(dest, src, n, size, workerAddOne, 3);
+    printDouble(dest, n, __FUNCTION__);
+    free(dest);
+}
+
 //=======================================================
 // List of unit test functions
 //=======================================================
@@ -267,8 +261,22 @@ void testPipelineSequential(void *src, size_t n, size_t size)
 typedef void (*TESTFUNCTION)(void *, size_t, size_t);
 
 TESTFUNCTION testFunction[] = {
-    // testScatterSequential,
-    // testFarm,
+    testMap,
+    testMapSequential,
+    testGather,
+    testGatherSequential,
+    testReduce,
+    testReduceSequential,
+    testScan,
+    testScanSequential,
+    testPack,
+    testPackSequential,
+    testScatter,
+    testScatterSequential,
+    testPipeline,
+    testPipelineSequential,
+    testFarm,
+    testFarmSequential
 };
 
 char *testNames[] = {
@@ -284,9 +292,10 @@ char *testNames[] = {
     "testPackSequential",
     "testScatter",
     "testScatterSequential",
-    "testPipelineSequential",
     "testPipeline",
-    // "testFarm",
+    "testPipelineSequential",
+    "testFarm",
+    "testFarmSequential"
 };
 
 int nTestFunction = sizeof(testFunction) / sizeof(testFunction[0]);
