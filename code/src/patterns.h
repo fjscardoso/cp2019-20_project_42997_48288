@@ -82,6 +82,15 @@ void scan(
     void (*worker)(void *v1, const void *v2, const void *v3) // [ v1 = op (v2, v3) ]
 );
 
+void scanSequential(
+    void *dest,                                              // Target array
+    void *src,                                               // Source array
+    size_t nJob,                                             // # elements in the source array
+    size_t sizeJob,                                          // Size of each element in the source array
+    void (*worker)(void *v1, const void *v2, const void *v3) // [ v1 = op (v2, v3) ]
+);
+
+
 int pack(
     void *dest,       // Target array
     void *src,        // Source array
@@ -90,7 +99,24 @@ int pack(
     const int *filter // Filer for pack
 );
 
+int packSequential(
+    void *dest,       // Target array
+    void *src,        // Source array
+    size_t nJob,      // # elements in the source array
+    size_t sizeJob,   // Size of each element in the source array
+    const int *filter // Filer for pack
+);
+
 void gather(
+    void *dest,        // Target array
+    void *src,         // Source array
+    size_t nJob,       // # elements in the source array
+    size_t sizeJob,    // Size of each element in the source array
+    const int *filter, // Filter for gather
+    int nFilter        // # elements in the filter
+);
+
+void gatherSequential(
     void *dest,        // Target array
     void *src,         // Source array
     size_t nJob,       // # elements in the source array

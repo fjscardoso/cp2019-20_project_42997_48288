@@ -185,60 +185,27 @@ void upPass(struct node* root, void *src, size_t lo, size_t hi, size_t sizeJob, 
     root->sum = malloc(sizeJob);
     root->fromleft = malloc(sizeJob);
 
-    //printf("%s", "passou por aqui");
-
-    //double *d = src;
-
     if(lo+1 == hi){
         memcpy(root->sum, src + lo * sizeJob, sizeJob);
         root->index = lo;
-
-        //printf ("%lu ", lo);
-
-        //memcpy(&d, &root->sum, sizeJob);
-
-        //printf ("%lf ", *d);
     }
 
     else
     {
 
-    //worker(root->sum, src + lo *sizeJob, src + (hi-1)*sizeJob);
-
-
     size_t mid = (lo+hi)/2;
 
-    //void *aux = malloc(nJob*sizeof(struct node));
+    #pragma omp task
+        upPass(root->right, src, lo, mid, sizeJob, worker);
 
-
-
-
-    //int tid = omp_get_num_threads();
-    //printf("%d", tid);
-    //int tid = omp_get_thread_num();
-    //printf("%d", tid);
-
-    //#pragma omp single
-        #pragma omp task
-            upPass(root->right, src, lo, mid, sizeJob, worker);
-
-            //tid = omp_get_thread_num();
-            //printf("%d", tid);
-    //#pragma omp single
-        #pragma omp task
-            upPass(root->left, src, mid, hi, sizeJob, worker);
-    //#pragma omp barrier
-    //}
+    #pragma omp task
+        upPass(root->left, src, mid, hi, sizeJob, worker);
 
 
     #pragma omp taskwait 
      
     worker(root->sum, root->left->sum, root->right->sum);
     
-    //memcpy(&d, &root->sum, sizeJob);
-
-    //printf ("%lf ", *d);
-  
     }
         
 }
@@ -314,18 +281,6 @@ int pack(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
 
     scan(bitsum, (void*)filter, nJob, sizeof(int), workerAddPack);
 
-    //char *ptr = aux;
-
-
-    //printf ("%s: ", "scan sum - ");
-    //for (int i = 0;  i < nJob;  i++)
-    //  printf ("%d", ((int*)aux)[i]);
-
-    //memcpy(&ptr, aux + pos * sizeof(int), sizeof(int));
-
-    //printf("VALOR PTR  = %s", ptr + pos *sizeof(int));
-
-
     #pragma omp parallel for
     for (int i = 0; i < nJob; i++)
     {
@@ -339,6 +294,8 @@ int pack(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
     }
     return pos;
 }
+
+
 
 //======================================================================================================================
 // GATHER
