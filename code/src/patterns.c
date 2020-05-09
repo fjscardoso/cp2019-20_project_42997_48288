@@ -108,7 +108,7 @@ void reduce(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(v
 //======================================================================================================================
 // SCAN
 //======================================================================================================================
-void scan(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2, const void *v3))
+void scanSequential(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2, const void *v3))
 {
     /* To be implemented */
     assert(dest != NULL);
@@ -122,6 +122,144 @@ void scan(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(voi
         for (int i = 1; i < nJob; i++)
             worker(&d[i * sizeJob], &d[(i - 1) * sizeJob], &s[i * sizeJob]);
     }
+}
+
+
+
+void scan(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2, const void *v3))
+{
+    /* To be implemented */
+    assert(dest != NULL);
+    assert(src != NULL);
+    assert(worker != NULL);
+    //char *d = dest;
+    //char *s = src;
+
+    struct node* root = malloc(sizeof(struct node));
+    root->right = malloc(sizeof(struct node));
+    root->left = malloc(sizeof(struct node));
+    root->sum = malloc(sizeJob);
+    root->fromleft = malloc(sizeJob);
+
+    root->fromleft = 0;
+
+    #pragma omp parallel num_threads(4)
+    {
+    #pragma omp single
+        upPass(root, src, 0, nJob, sizeJob, worker);
+
+    #pragma omp single
+    {
+        #pragma omp task
+            downPass(src, dest, -1, root, root->right, sizeJob, worker);
+
+        #pragma omp task
+            downPass(src, dest, 1, root, root->left, sizeJob, worker);
+
+    }
+}
+    //#pragma omp taskwait
+
+
+
+/**    if (nJob > 1)
+    {
+        memcpy(&d[0], &s[0], sizeJob);
+        for (int i = 1; i < nJob; i++)
+            worker(&d[i * sizeJob], &d[(i - 1) * sizeJob], &s[i * sizeJob]);
+    }
+    */
+}
+
+void upPass(struct node* root, void *src, size_t lo, size_t hi, size_t sizeJob, void (*worker)(void *v1, const void *v2, const void *v3))
+{
+
+    root->right = malloc(sizeof(struct node));
+    root->left = malloc(sizeof(struct node));
+    root->index = -1;
+    root->sum = malloc(sizeJob);
+    root->fromleft = malloc(sizeJob);
+
+    //printf("%s", "passou por aqui");
+
+    //double *d = src;
+
+    if(lo+1 == hi){
+        memcpy(root->sum, src + lo * sizeJob, sizeJob);
+        root->index = lo;
+
+        //printf ("%lu ", lo);
+
+        //memcpy(&d, &root->sum, sizeJob);
+
+        //printf ("%lf ", *d);
+    }
+
+    else
+    {
+
+    //worker(root->sum, src + lo *sizeJob, src + (hi-1)*sizeJob);
+
+
+    size_t mid = (lo+hi)/2;
+
+    //void *aux = malloc(nJob*sizeof(struct node));
+
+
+
+
+    //int tid = omp_get_num_threads();
+    //printf("%d", tid);
+    //int tid = omp_get_thread_num();
+    //printf("%d", tid);
+
+    //#pragma omp single
+        #pragma omp task
+            upPass(root->right, src, lo, mid, sizeJob, worker);
+
+            //tid = omp_get_thread_num();
+            //printf("%d", tid);
+    //#pragma omp single
+        #pragma omp task
+            upPass(root->left, src, mid, hi, sizeJob, worker);
+    //#pragma omp barrier
+    //}
+
+
+    #pragma omp taskwait 
+     
+    worker(root->sum, root->left->sum, root->right->sum);
+    
+    //memcpy(&d, &root->sum, sizeJob);
+
+    //printf ("%lf ", *d);
+  
+    }
+        
+}
+
+void downPass(void *src, void *dest, size_t isleft, struct node* parent, struct node* child, size_t sizeJob, void (*worker)(void *v1, const void *v2, const void *v3))
+{
+
+    if(isleft != -1)
+        child->fromleft = parent->fromleft;
+    else
+        worker(child->fromleft, parent->fromleft, parent->left->sum);
+
+    if(child->index != -1)
+        worker(dest + child->index * sizeJob, child->fromleft, src + child->index * sizeJob);
+    else
+    {
+    #pragma omp task
+    downPass(src, dest, -1, child, child->right, sizeJob, worker);
+
+    #pragma omp task
+    downPass(src, dest, 1, child, child->left, sizeJob, worker);
+
+   // #pragma omp taskwait
+    }
+
+
 }
 
 //======================================================================================================================
