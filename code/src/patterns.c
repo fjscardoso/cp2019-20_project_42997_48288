@@ -180,60 +180,27 @@ void upPass(struct node* root, void *src, size_t lo, size_t hi, size_t sizeJob, 
     root->sum = malloc(sizeJob);
     root->fromleft = malloc(sizeJob);
 
-    //printf("%s", "passou por aqui");
-
-    //double *d = src;
-
     if(lo+1 == hi){
         memcpy(root->sum, src + lo * sizeJob, sizeJob);
         root->index = lo;
-
-        //printf ("%lu ", lo);
-
-        //memcpy(&d, &root->sum, sizeJob);
-
-        //printf ("%lf ", *d);
     }
 
     else
     {
 
-    //worker(root->sum, src + lo *sizeJob, src + (hi-1)*sizeJob);
-
-
     size_t mid = (lo+hi)/2;
 
-    //void *aux = malloc(nJob*sizeof(struct node));
+    #pragma omp task
+        upPass(root->right, src, lo, mid, sizeJob, worker);
 
-
-
-
-    //int tid = omp_get_num_threads();
-    //printf("%d", tid);
-    //int tid = omp_get_thread_num();
-    //printf("%d", tid);
-
-    //#pragma omp single
-        #pragma omp task
-            upPass(root->right, src, lo, mid, sizeJob, worker);
-
-            //tid = omp_get_thread_num();
-            //printf("%d", tid);
-    //#pragma omp single
-        #pragma omp task
-            upPass(root->left, src, mid, hi, sizeJob, worker);
-    //#pragma omp barrier
-    //}
+    #pragma omp task
+        upPass(root->left, src, mid, hi, sizeJob, worker);
 
 
     #pragma omp taskwait 
      
     worker(root->sum, root->left->sum, root->right->sum);
     
-    //memcpy(&d, &root->sum, sizeJob);
-
-    //printf ("%lf ", *d);
-  
     }
         
 }
@@ -265,7 +232,7 @@ void downPass(void *src, void *dest, size_t isleft, struct node* parent, struct 
 //======================================================================================================================
 // PACK
 //======================================================================================================================
-int pack(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
+int packSequential(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
 {
     /* To be implemented */
     assert(dest != NULL);
@@ -286,6 +253,44 @@ int pack(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
     }
     return pos;
 }
+
+static void workerAddPack(void *a, const void *b, const void *c)
+{
+    // a = b + c
+    *(TYPE *)a = *(TYPE *)b + *(TYPE *)c;
+}
+
+int pack(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
+{
+    /* To be implemented */
+    assert(dest != NULL);
+    assert(src != NULL);
+    assert(filter != NULL);
+    assert(nJob >= 0);
+    assert(sizeJob > 0);
+    char *d = dest;
+    char *s = src;
+    int pos = 0;
+
+    void *bitsum = malloc((nJob+1) * sizeof(int));
+
+    scan(bitsum, (void*)filter, nJob, sizeof(int), workerAddPack);
+
+    #pragma omp parallel for
+    for (int i = 0; i < nJob; i++)
+    {
+
+        if (filter[i])
+        {
+            int x = ((int*)bitsum)[i];
+            memcpy(&d[(x-1) * sizeJob], &s[i * sizeJob], sizeJob);
+            pos++;
+        }
+    }
+    return pos;
+}
+
+
 
 //======================================================================================================================
 // GATHER

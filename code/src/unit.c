@@ -125,19 +125,6 @@ void testGather(void *src, size_t n, size_t size)
     free(dest);
 }
 
-void testGatherSequential(void *src, size_t n, size_t size)
-{
-    int nFilter = n / 10000;
-    TYPE *dest = malloc(nFilter * size);
-    int filter[nFilter];
-    for (int i = 0; i < nFilter; i++)
-        filter[i] = rand() % n;
-    printInt(filter, nFilter, "filter");
-    gather(dest, src, n, size, filter, nFilter);
-    printDouble(dest, nFilter, __FUNCTION__);
-    free(dest);
-}
-
 void testScatter(void *src, size_t n, size_t size)
 {
     int nDest = 6;
@@ -171,6 +158,20 @@ void testFarm(void *src, size_t n, size_t size)
     TYPE *dest = malloc(n * size);
     farm(dest, src, n, size, workerAddOne, 3);
     printDouble(dest, n, __FUNCTION__);
+    free(dest);
+}
+
+void testPackSequential(void *src, size_t n, size_t size)
+{
+    int nFilter = 3;
+    TYPE *dest = malloc(nFilter * size);
+    int *filter = calloc(n, sizeof(*filter));
+    for (int i = 0; i < n; i++)
+        filter[i] = (i == 0 || i == n / 2 || i == n - 1);
+    int newN = packSequential(dest, src, n, size, filter);
+    printInt(filter, n, "filter");
+    printDouble(dest, newN, __FUNCTION__);
+    free(filter);
     free(dest);
 }
 
@@ -218,6 +219,20 @@ void testScatterSequential(void *src, size_t n, size_t size)
     free(dest);
 }
 
+void testGatherSequential(void *src, size_t n, size_t size)
+{
+    int nFilter = n / 10000;
+    TYPE *dest = malloc(nFilter * size);
+    int filter[nFilter];
+    for (int i = 0; i < nFilter; i++)
+        filter[i] = rand() % n;
+    printInt(filter, nFilter, "filter");
+    gatherSequential(dest, src, n, size, filter, nFilter);
+    printDouble(dest, nFilter, __FUNCTION__);
+    free(dest);
+}
+
+
 //=======================================================
 // List of unit test functions
 //=======================================================
@@ -233,7 +248,8 @@ TESTFUNCTION testFunction[] = {
     testReduceSequential,
     testScan,
     testScanSequential,
-    // testPack,
+    testPack,
+    testPackSequential,
     //testScatter,
     testScatter,
     testScatterSequential,
@@ -250,7 +266,8 @@ char *testNames[] = {
     "testReduceSequential",
     "testScan",
     "testScanSequential",
-    // "testPack",
+    "testPack",
+    "testPackSequential",
     "testScatter",
     "testScatterSequential",
     // "testPipeline",
