@@ -114,7 +114,8 @@ void testPack(void *src, size_t n, size_t size)
 
 void testGather(void *src, size_t n, size_t size)
 {
-    int nFilter = n / 10000;
+    //int nFilter = n / 10000;
+    int nFilter = n * 0.02;
     TYPE *dest = malloc(nFilter * size);
     int filter[nFilter];
     for (int i = 0; i < nFilter; i++)
@@ -164,7 +165,6 @@ void testFarm(void *src, size_t n, size_t size)
 //=======================================================
 // List of unit test sequential
 //=======================================================
-
 
 void testScanSequential(void *src, size_t n, size_t size)
 {
@@ -221,7 +221,8 @@ void testScatterSequential(void *src, size_t n, size_t size)
 
 void testGatherSequential(void *src, size_t n, size_t size)
 {
-    int nFilter = n / 10000;
+    //int nFilter = n / 10000;
+    int nFilter = n * 0.02;
     TYPE *dest = malloc(nFilter * size);
     int filter[nFilter];
     for (int i = 0; i < nFilter; i++)
@@ -231,7 +232,6 @@ void testGatherSequential(void *src, size_t n, size_t size)
     printDouble(dest, nFilter, __FUNCTION__);
     free(dest);
 }
-
 
 void testPipelineSequential(void *src, size_t n, size_t size)
 {
@@ -267,17 +267,16 @@ TESTFUNCTION testFunction[] = {
     testGatherSequential,
     testReduce,
     testReduceSequential,
-    testScan,
-    testScanSequential,
-    testPack,
-    testPackSequential,
+    // testScan,
+    // testScanSequential,
+    // testPack,
+    // testPackSequential,
     testScatter,
     testScatterSequential,
     testPipeline,
     testPipelineSequential,
     testFarm,
-    testFarmSequential
-};
+    testFarmSequential};
 
 char *testNames[] = {
     "testMap",
@@ -286,16 +285,15 @@ char *testNames[] = {
     "testGatherSequential",
     "testReduce",
     "testReduceSequential",
-    "testScan",
-    "testScanSequential",
-    "testPack",
-    "testPackSequential",
+    // "testScan",
+    // "testScanSequential",
+    // "testPack",
+    // "testPackSequential",
     "testScatter",
     "testScatterSequential",
     "testPipeline",
     "testPipelineSequential",
     "testFarm",
-    "testFarmSequential"
-};
+    "testFarmSequential"};
 
 int nTestFunction = sizeof(testFunction) / sizeof(testFunction[0]);

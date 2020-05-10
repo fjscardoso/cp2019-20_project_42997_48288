@@ -23,7 +23,7 @@ double wctime()
 
 int main(int argc, char *argv[])
 {
-    int i, N;
+    int i, N, threads;
 
     //Code to check input from command line
     int c;
@@ -40,17 +40,23 @@ int main(int argc, char *argv[])
     argc -= optind;
     argv += optind;
 
-    if (argc != 1)
+    // if (argc != 1)
+    // {
+    //     printf("Usage: ./example N\n");
+    //     return -1;
+    // }
+    if (argc == 2)
     {
-        printf("Usage: ./example N\n");
-        return -1;
+        threads = atoi(argv[0]);
+        //printf("THREADS: %i\n", threads);
     }
+
     //Initialization functions for random numbers
     srand48(time(NULL));
     srand48(time(NULL));
 
     //Converts String to long
-    N = atol(argv[0]);
+    N = atol(argv[1]);
 
     //Malloc memory for [] src
     //printf("Initializing SRC array\n");
@@ -72,7 +78,7 @@ int main(int argc, char *argv[])
         double start = omp_get_wtime();
         testFunction[i](src, N, sizeof(*src));
         double end = omp_get_wtime();
-        printf("%d,%s,%6.3lf\n", N, testNames[i], end - start);
+        printf("%d,%s,%6.3lf,%d\n", N, testNames[i], end - start, threads);
         if (debug)
             printf("\n\n");
     }

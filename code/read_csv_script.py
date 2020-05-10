@@ -5,7 +5,7 @@ with open('output.csv', newline='') as oldFile:
     with open('output1.csv', 'w') as newFile:
         reader = csv.reader(oldFile)
         writer = csv.writer(newFile)
-        writer.writerow(['Array_Size', 'Pattern_Tested', 'Time'])
+        writer.writerow(['Array_Size', 'Pattern_Tested', 'Time', 'Threads'])
         for row in reader:
             writer.writerow(row)
 
