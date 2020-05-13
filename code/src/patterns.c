@@ -271,9 +271,9 @@ int pack(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
     char *s = src;
     int pos = 0;
 
-    void *bitsum = malloc((nJob + 1) * sizeof(int));
+    void *bitsum = malloc((nJob) * sizeof(int));
 
-    scan(bitsum, (void *)filter, nJob, sizeof(int), workerAddPack);
+    scanSequential(bitsum, (void *)filter, nJob, sizeof(int), workerAddPack);
 
 #pragma omp parallel for num_threads(THREADS_NUM)
     for (int i = 0; i < nJob; i++)
@@ -286,7 +286,11 @@ int pack(void *dest, void *src, size_t nJob, size_t sizeJob, const int *filter)
             pos++;
         }
     }
+
+    free(bitsum);
+
     return pos;
+
 }
 
 //======================================================================================================================
