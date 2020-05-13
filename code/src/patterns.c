@@ -129,10 +129,6 @@ void scanSequential(void *dest, void *src, size_t nJob, size_t sizeJob, void (*w
     char *d = dest;
     char *s = src;
 
-    //printf ("%s: ", "scan filter - ");
-    //for (int i = 0;  i < nJob;  i++)
-    //    printf ("%d", ((int*)src)[i]);
-
     if (nJob > 1)
     {
         memcpy(&d[0], &s[0], sizeJob);
@@ -191,7 +187,6 @@ void downPass(void *src, void *dest, size_t isleft, struct node *parent, struct 
 #pragma omp task
         downPass(src, dest, 1, child, child->left, sizeJob, worker);
 
-        // #pragma omp taskwait
     }
 }
 
@@ -226,15 +221,7 @@ void scan(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(voi
             downPass(src, dest, 1, root, root->left, sizeJob, worker);
         }
     }
-    //#pragma omp taskwait
 
-    /**    if (nJob > 1)
-    {
-        memcpy(&d[0], &s[0], sizeJob);
-        for (int i = 1; i < nJob; i++)
-            worker(&d[i * sizeJob], &d[(i - 1) * sizeJob], &s[i * sizeJob]);
-    }
-    */
 }
 
 //======================================================================================================================
