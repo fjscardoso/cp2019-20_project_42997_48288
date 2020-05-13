@@ -1,34 +1,6 @@
 #ifndef __PATTERNS_H
 #define __PATTERNS_H
 
-struct node {
-  void* sum;
-  void* fromleft;
-  size_t index;
-
-  struct node* left;
-  struct node* right;
-};
-
-void upPass(
-  struct node* root,           // Target array
-  void *src,            // Source array
-  size_t lo,          // # elements in the source array
-  size_t hi,          // # elements in the source array
-  size_t sizeJob,       // Size of each element in the source array
-  void (*worker)(void *v1, const void *v2, const void *v3) // [ v1 = op (v2, v3) ]
-  );
-
-void downPass(
-  void *src,            // Source array
-  void *dest,           // Target array
-  size_t isleft,
-  struct node* parent,
-  struct node* child,
-  size_t sizeJob,       // Size of each element in the source array
-  void (*worker)(void *v1, const void *v2, const void *v3) // [ v1 = op (v2, v3) ]
-  );
-
 void map(
     void *dest,                              // Target array
     void *src,                               // Source array

@@ -9,6 +9,15 @@
 
 #define THREADS_NUM 4
 
+struct node {
+  void* sum;
+  void* fromleft;
+  size_t index;
+
+  struct node* left;
+  struct node* right;
+};
+
 //======================================================================================================================
 // MAP
 //======================================================================================================================
@@ -132,48 +141,6 @@ void scanSequential(void *dest, void *src, size_t nJob, size_t sizeJob, void (*w
     }
 }
 
-void scan(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2, const void *v3))
-{
-    /* To be implemented */
-    assert(dest != NULL);
-    assert(src != NULL);
-    assert(worker != NULL);
-    //char *d = dest;
-    //char *s = src;
-
-    struct node *root = malloc(sizeof(struct node));
-    root->right = malloc(sizeof(struct node));
-    root->left = malloc(sizeof(struct node));
-    root->sum = malloc(sizeJob);
-    root->fromleft = malloc(sizeJob);
-
-    root->fromleft = 0;
-
-#pragma omp parallel num_threads(THREADS_NUM)
-    {
-#pragma omp single
-        upPass(root, src, 0, nJob, sizeJob, worker);
-
-#pragma omp single
-        {
-#pragma omp task
-            downPass(src, dest, -1, root, root->right, sizeJob, worker);
-
-#pragma omp task
-            downPass(src, dest, 1, root, root->left, sizeJob, worker);
-        }
-    }
-    //#pragma omp taskwait
-
-    /**    if (nJob > 1)
-    {
-        memcpy(&d[0], &s[0], sizeJob);
-        for (int i = 1; i < nJob; i++)
-            worker(&d[i * sizeJob], &d[(i - 1) * sizeJob], &s[i * sizeJob]);
-    }
-    */
-}
-
 void upPass(struct node *root, void *src, size_t lo, size_t hi, size_t sizeJob, void (*worker)(void *v1, const void *v2, const void *v3))
 {
 
@@ -226,6 +193,48 @@ void downPass(void *src, void *dest, size_t isleft, struct node *parent, struct 
 
         // #pragma omp taskwait
     }
+}
+
+void scan(void *dest, void *src, size_t nJob, size_t sizeJob, void (*worker)(void *v1, const void *v2, const void *v3))
+{
+    /* To be implemented */
+    assert(dest != NULL);
+    assert(src != NULL);
+    assert(worker != NULL);
+    //char *d = dest;
+    //char *s = src;
+
+    struct node *root = malloc(sizeof(struct node));
+    root->right = malloc(sizeof(struct node));
+    root->left = malloc(sizeof(struct node));
+    root->sum = malloc(sizeJob);
+    root->fromleft = malloc(sizeJob);
+
+    root->fromleft = 0;
+
+#pragma omp parallel num_threads(THREADS_NUM)
+    {
+#pragma omp single
+        upPass(root, src, 0, nJob, sizeJob, worker);
+
+#pragma omp single
+        {
+#pragma omp task
+            downPass(src, dest, -1, root, root->right, sizeJob, worker);
+
+#pragma omp task
+            downPass(src, dest, 1, root, root->left, sizeJob, worker);
+        }
+    }
+    //#pragma omp taskwait
+
+    /**    if (nJob > 1)
+    {
+        memcpy(&d[0], &s[0], sizeJob);
+        for (int i = 1; i < nJob; i++)
+            worker(&d[i * sizeJob], &d[(i - 1) * sizeJob], &s[i * sizeJob]);
+    }
+    */
 }
 
 //======================================================================================================================
