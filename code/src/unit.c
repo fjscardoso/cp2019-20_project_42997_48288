@@ -261,41 +261,41 @@ void testFarmSequential(void *src, size_t n, size_t size)
 typedef void (*TESTFUNCTION)(void *, size_t, size_t);
 
 TESTFUNCTION testFunction[] = {
-    //testMap,
-    //testMapSequential,
-    //testGather,
-    //testGatherSequential,
-    //testReduce,
-    //testReduceSequential,
-    // testScan,
-    // testScanSequential,
-     testPack,
-     testPackSequential,
-    //testScatter,
-    //testScatterSequential,
-    //testPipeline,
-    //testPipelineSequential,
-    //testFarm,
-    //testFarmSequential
+    testMap,
+    testMapSequential,
+    testGather,
+    testGatherSequential,
+    testReduce,
+    testReduceSequential,
+    testScan,
+    testScanSequential,
+    testPack,
+    testPackSequential,
+    testScatter,
+    testScatterSequential,
+    testPipeline,
+    testPipelineSequential,
+    testFarm,
+    testFarmSequential
  };
 
 char *testNames[] = {
-    //"testMap",
-    //"testMapSequential",
-    //"testGather",
-    //"testGatherSequential",
-    //"testReduce",
-    //"testReduceSequential",
-    // "testScan",
-    // "testScanSequential",
-     "testPack",
-     "testPackSequential",
-    //"testScatter",
-    //"testScatterSequential",
-    //"testPipeline",
-    //"testPipelineSequential",
-    //"testFarm",
-    //"testFarmSequential"
+    "testMap",
+    "testMapSequential",
+    "testGather",
+    "testGatherSequential",
+    "testReduce",
+    "testReduceSequential",
+    "testScan",
+    "testScanSequential",
+    "testPack",
+    "testPackSequential",
+    "testScatter",
+    "testScatterSequential",
+    "testPipeline",
+    "testPipelineSequential",
+    "testFarm",
+    "testFarmSequential"
  };
 
 int nTestFunction = sizeof(testFunction) / sizeof(testFunction[0]);
